@@ -1,3 +1,4 @@
+import { CoursesStore } from "./../services/courses.store";
 import { MessagesService } from "./../messages/messages.service";
 import { CoursesService } from "./../services/courses.service";
 import { Component, OnInit } from "@angular/core";
@@ -28,39 +29,15 @@ export class HomeComponent implements OnInit {
 
   advancedCourses$: Observable<Course[]>;
 
-  constructor(
-    private coursesService: CoursesService,
-    private loadingService: LoadingService,
-    private messagesService: MessagesService
-  ) {}
+  constructor(private coursesStore: CoursesStore) {}
 
   ngOnInit() {
     this.reloadCourses();
   }
 
   reloadCourses() {
-    const courses$ = this.coursesService.loadAllCourses().pipe(
-      map((courses) => courses.sort(sortCoursesBySeqNo)),
-      catchError((err) => {
-        const message = "Could not load courses";
-        this.messagesService.showErrors(message);
-        console.log(message, err);
-        return throwError(err);
-      })
-    );
+    this.beginnerCourses$ = this.coursesStore.filterByCategory("BEGINNER");
 
-    const loadCourses$ = this.loadingService.showLoaderUntilCompleted(courses$);
-
-    this.beginnerCourses$ = loadCourses$.pipe(
-      map((courses) =>
-        courses.filter((course) => course.category === "BEGINNER")
-      )
-    );
-
-    this.advancedCourses$ = loadCourses$.pipe(
-      map((courses) =>
-        courses.filter((course) => course.category === "ADVANCED")
-      )
-    );
+    this.advancedCourses$ = this.coursesStore.filterByCategory("ADVANCED");
   }
 }
