@@ -1,3 +1,4 @@
+import { AuthStore } from "./services/auth.store";
 import { MessagesService } from "./messages/messages.service";
 import { Component, OnInit } from "@angular/core";
 import { LoadingService } from "./loading/loading.service";
@@ -9,9 +10,11 @@ import { LoadingService } from "./loading/loading.service";
   providers: [],
 })
 export class AppComponent implements OnInit {
-  constructor() {}
+  constructor(public auth: AuthStore) {}
 
   ngOnInit() {}
 
-  logout() {}
+  logout() {
+    this.auth.logout();
+  }
 }
