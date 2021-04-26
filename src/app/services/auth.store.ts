@@ -1,16 +1,36 @@
+import { HttpClient } from "@angular/common/http";
+import { map, tap, shareReplay } from "rxjs/operators";
 import { User } from "./../model/user";
-import { Observable } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 import { Injectable } from "@angular/core";
 
 @Injectable({
   providedIn: "root",
 })
 export class AuthStore {
-  user$: Observable<User>;
+  private subject = new BehaviorSubject<User>(null);
+
+  user$: Observable<User> = this.subject.asObservable();
+
   isLoggedIn$: Observable<boolean>;
   isLoggedOut$: Observable<boolean>;
 
-  login(email: string, password: string): Observable<User> {}
+  constructor(private http: HttpClient) {
+    this.isLoggedIn$ = this.user$.pipe(map((user) => !!user));
 
-  logout() {}
+    this.isLoggedOut$ = this.user$.pipe(map((loggedIn) => !loggedIn));
+  }
+
+  login(email: string, password: string): Observable<User> {
+    return this.http
+      .post<User>("/api/login", { email, password })
+      .pipe(
+        tap((user) => this.subject.next(user)),
+        shareReplay()
+      );
+  }
+
+  logout() {
+    this.subject.next(null);
+  }
 }
