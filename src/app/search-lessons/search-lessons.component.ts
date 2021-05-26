@@ -1,6 +1,7 @@
 import { CoursesService } from "./../services/courses.service";
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   OnInit,
@@ -28,6 +29,7 @@ import { Lesson } from "../model/lesson";
   selector: "course",
   templateUrl: "./search-lessons.component.html",
   styleUrls: ["./search-lessons.component.css"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchLessonsComponent implements OnInit {
   searchResults$: Observable<Lesson[]>;
